@@ -56,7 +56,7 @@ class CommentLimiter
      */
     public function canPost(int $userId): bool
     {
-        $now = (int) floor(microtime(true) * 1000000);
+        $now = (int)floor(microtime(true) * 1000000);
         $windowStart = $now - self::WINDOW_MICROSECONDS;
         $key = $this->buildKey($userId);
         $member = $this->buildMember($now);
@@ -65,16 +65,16 @@ class CommentLimiter
             $this->getLimitScript(),
             [
                 $key,
-                (string) $windowStart,
-                (string) $now,
+                (string)$windowStart,
+                (string)$now,
                 $member,
-                (string) self::COMMENTS_LIMIT,
-                (string) self::WINDOW_SECONDS,
+                (string)self::COMMENTS_LIMIT,
+                (string)self::WINDOW_SECONDS,
             ],
             1
         );
 
-        return (int) $result === 1;
+        return (int)$result === 1;
     }
 
     /**

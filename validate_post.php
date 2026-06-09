@@ -8,6 +8,9 @@
  * - регулярными выражениями проверяется форма тегов, атрибутов и XML-сущностей;
  * - обычной логикой со стеком проверяются закрывающие теги и вложенность;
  * - DOM, SimpleXML, XMLReader и похожие встроенные парсеры не используются.
+ *
+ * @param mixed $post
+ * @return bool
  */
 function validatePost(mixed $post): bool
 {
@@ -40,7 +43,7 @@ function validatePost(mixed $post): bool
         $tagStart = strpos($post, '<', $position);
 
         if ($tagStart === false) {
-            // Пункт 3: в конце поста стек должен быть пустым, иначе остались незакрытые теги.
+            // в конце поста стек должен быть пустым, иначе остались незакрытые теги.
             return validateXmlText(substr($post, $position)) && empty($stack);
         }
 
@@ -88,8 +91,12 @@ function validatePost(mixed $post): bool
 /**
  * Находит позицию закрывающей угловой скобки текущего тега.
  *
- * Символ `>` внутри кавычек атрибута не завершает тег, а повторный `<`
+ * Символ > внутри кавычек атрибута не завершает тег, а повторный <
  * внутри тега считается ошибкой XHTML-разметки.
+ *
+ * @param string $post
+ * @param int $start
+ * @return int|false
  */
 function findTagEnd(string $post, int $start): int|false
 {
@@ -131,6 +138,10 @@ function findTagEnd(string $post, int $start): int|false
  *
  * Возвращает массив с именем тега и признаком закрывающего тега либо false,
  * если тег запрещен, написан неверно или содержит запрещенные атрибуты.
+ *
+ * @param string $tag
+ * @param array $allowedTags
+ * @return array|false
  */
 function parseTag(string $tag, array $allowedTags): array|false
 {
@@ -196,8 +207,11 @@ function parseTag(string $tag, array $allowedTags): array|false
 /**
  * Разбирает строку атрибутов открывающего тега.
  *
- * Поддерживает XHTML-форму `name="value"` и `name='value'`.
+ * Поддерживает XHTML-форму name="value" и name='value'.
  * Возвращает ассоциативный массив атрибутов либо false при ошибке.
+ *
+ * @param string $source
+ * @return array|false
  */
 function parseAttributes(string $source): array|false
 {
@@ -244,8 +258,12 @@ function parseAttributes(string $source): array|false
 /**
  * Проверяет обычный текст или значение атрибута на XML/XHTML-валидность.
  *
- * Запрещает управляющие XML-символы, неэкранированный `&`,
+ * Запрещает управляющие XML-символы, неэкранированный &,
  * неизвестные сущности и некорректные числовые ссылки на символы.
+ *
+ * @param string $text
+ * @param bool $rejectCdataClose
+ * @return bool
  */
 function validateXmlText(string $text, bool $rejectCdataClose = true): bool
 {
@@ -291,6 +309,9 @@ function validateXmlText(string $text, bool $rejectCdataClose = true): bool
 
 /**
  * Проверяет, разрешен ли Unicode code point правилами XML 1.0.
+ *
+ * @param int $codePoint
+ * @return bool
  */
 function isValidXmlCodePoint(int $codePoint): bool
 {
